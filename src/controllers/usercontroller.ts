@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 
 interface CustomRequest extends Request {
-    session: any; // Assuming session object, you can further type it if you have a custom session interface
+    session: any; 
 }
 
 class UserController {
@@ -69,7 +69,7 @@ class UserController {
             const userData = await user.save();
 
             if (userData) {
-                res.render('user/registration', { message: "Your registration has been successful." });
+                res.render('user/login', { message: "Your registration has been successful." });
             } else {
                 res.render('user/registration', { message: "Your registration has failed." });
             }
@@ -104,6 +104,46 @@ class UserController {
         } catch (error) {
             console.error('Error in verifyLogin:', (error as Error).message);
             res.render('user/login', { message: "An error occurred during login." });
+        }
+    }
+
+
+    public async editLoad(req: CustomRequest, res: Response): Promise<void> {
+        try {
+            const id = req.query.id as string;
+
+            const userData = await User.findById(id);
+
+            if (userData) {
+                res.render('user/edit', { user: userData });
+            } else {
+                res.redirect('user/home');
+            }
+        } catch (error) {
+            console.error('Error in editLoad:', (error as Error).message);
+            res.redirect('user/home');
+        }
+    }
+
+    public async updateProfile(req: CustomRequest, res: Response): Promise<void> {
+        try {
+            const userId = req.body.user_id;
+            const updateData: { name: string; email: string; mobile: string; image?: string } = {
+                name: req.body.name,
+                email: req.body.email,
+                mobile: req.body.mno
+            };
+
+            if (req.file) {
+                updateData.image = req.file.filename;
+            }
+
+            await User.findByIdAndUpdate(userId, { $set: updateData });
+
+            res.redirect('/');
+        } catch (error) {
+            console.error('Error in updateProfile:', (error as Error).message);
+            res.redirect('/');
         }
     }
 

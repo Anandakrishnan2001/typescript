@@ -5,6 +5,7 @@ import path from 'path';
 import nocache from 'nocache';
 import mongoose from 'mongoose';
 import userRoute from './routes/userroute';
+import adminroute from './routes/adminroute';
 import multer from 'multer';
 
 dotenv.config();
@@ -64,6 +65,8 @@ const upload = multer({ storage: storage });
 
 // Use routes with multer middleware for handling file uploads
 app.use('/', upload.single('image'), userRoute);
+app.use('/admin',adminroute);
+
 
 // Start the server
 app.listen(port, () => {
